@@ -1,6 +1,17 @@
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { TaskService } from './task.service'
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpCode,
+	Param,
+	Post,
+	Put,
+	UsePipes,
+	ValidationPipe,
+} from '@nestjs/common'
 import { User } from 'src/user/decorators/user.decorator'
 import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto'
 
@@ -8,12 +19,20 @@ import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto'
 export class TaskController {
 	constructor(private readonly TaskService: TaskService) {}
 
+	@Get('all')
+	@Auth()
+	async getAll(@User('_id') _id: string) {
+		return this.TaskService.getAll(_id)
+	}
+
 	@Get(':id')
 	@Auth()
-	async getAll(@Param('id') id:string) {
+	async getById(@Param('id') id: string) {
 		return this.TaskService.getById(id)
 	}
 
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
 	@Post('')
 	@Auth()
 	async createTask(@User('_id') _id: string, @Body() dto: CreateTaskDto) {
@@ -28,13 +47,13 @@ export class TaskController {
 
 	@Put('completed')
 	@Auth()
-	async toggleCompleted(@User('_id') _id:string, @Body('taskId') taskId: string){
-		return this.TaskService.toggleCompleted(_id, taskId)
-	}	
+	async toggleCompleted(@Body('taskId') taskId: string) {
+		return this.TaskService.toggleCompleted(taskId)
+	}
 
 	@Delete('')
 	@Auth()
-	async deleteTask(@User('_id') _id:string, @Body('taskId') taskId: string) {
-		return this.TaskService.deleteTask(_id, taskId)
+	async deleteTask(@Body('taskId') taskId: string) {
+		return this.TaskService.deleteTask(taskId)
 	}
 }

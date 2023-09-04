@@ -58,10 +58,9 @@ export class UserService {
 	}
 
 	getDaysUser(user: UserModel) {
-		var today = new Date()
-		var userDays = user.createdAt
+		const today = new Date()
+		const userDays = user.createdAt
 		today.setDate(today.getDate() - userDays.getDate())
-		console.log(today.getDate())
 		return today.getDate()
 	}
 }

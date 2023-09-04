@@ -12,22 +12,41 @@ export class TaskService {
 		private readonly UserService: UserService
 	) {}
 
+	async getAll(_id: string) {
+		const author = this.UserService.byId(_id)
+
+		const task = []
+		const historyTask = []
+
+		const tasks = await this.TaskModel.find({ author: author })
+
+		for (let i = 0; i < tasks.length; i++) {
+			const taskOne = tasks[i]
+			if (taskOne.isCompleted) {
+				historyTask.push(taskOne)
+			} else {
+				task.push(taskOne)
+			}
+			return
+		}
+		return { task, historyTask }
+	}
+
 	async getById(_id: string) {
 		const task = await this.TaskModel.findById(_id)
-		if (task) throw new NotFoundException('Tasks not found')
+		if (!task) throw new NotFoundException('Tasks not found')
 		return task
 	}
 
 	async createTask({ _id, title, content, deadline, priority }: CreateTaskDto) {
 		const user = await this.UserService.byId(_id)
 		const newTask = new this.TaskModel({
+			author: user,
 			title,
 			content,
 			deadline,
 			priority,
 		})
-		user.task.push(newTask)
-		await user.save()
 		const doc = await newTask.save()
 		return doc
 	}
@@ -55,40 +74,19 @@ export class TaskService {
 		return doc
 	}
 
-	async toggleCompleted(taskId: string, _id: string) {
+	async toggleCompleted(taskId: string) {
 		const task = await this.getById(taskId)
-		const user = await this.UserService.byId(_id)
 		if (task.isCompleted) {
 			task.isCompleted = false
-			if (user.history.length > 1) {
-				user.history.filter((item) => {
-					return item._id !== task._id
-				})
-			} else {
-				user.history = []
-			}
 			const doc = await task.save()
-			await user.save()
 			return doc
 		}
 		task.isCompleted = true
-		user.history.push(task)
 		const doc = await task.save()
-		await user.save()
 		return doc
 	}
 
-	async deleteTask(_id: string, taskId: string) {
-		const user = await this.UserService.byId(_id)
-		const task = await this.TaskModel.findByIdAndDelete(taskId)
-		if (user.task.length > 1) {
-			user.task.filter((item) => {
-				return item._id !== task._id
-			})
-		} else {
-			user.task = []
-		}
-		await user.save()
-		return task
+	async deleteTask(taskId: string) {
+		return this.TaskModel.findByIdAndDelete(taskId)
 	}
 }

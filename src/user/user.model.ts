@@ -1,6 +1,5 @@
-import { Ref, prop } from '@typegoose/typegoose'
+import { prop } from '@typegoose/typegoose'
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
-import { TaskModel } from 'src/task/task.model'
 
 export interface UserModel extends Base {}
 
@@ -22,10 +21,5 @@ export class UserModel extends TimeStamps {
 
 	@prop({ default: 'No target' })
 	target: string
-
-	@prop({ default: [] })
-	task: Ref<TaskModel>[]
-
-	@prop({ default: [] })
-	history: Ref<TaskModel>[]
+	
 }

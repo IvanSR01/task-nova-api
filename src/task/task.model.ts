@@ -7,6 +7,9 @@ export interface TaskModel extends Base {}
 export class TaskModel extends TimeStamps {
 
 	@prop()
+	author: Ref<UserModel>
+
+	@prop()
 	title:string
 
 	@prop()
@@ -19,6 +22,6 @@ export class TaskModel extends TimeStamps {
 	isCompleted: boolean
 
 	@prop()
-	deadline: Date
+	deadline: string
 
 }

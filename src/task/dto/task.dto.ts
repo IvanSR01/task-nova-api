@@ -11,8 +11,8 @@ export class CreateTaskDto {
 	@IsString()
 	priority: string
 
-	@IsDate()
-	deadline: Date
+	@IsString()
+	deadline: string
 }
 
 export class UpdateTaskDto {
@@ -24,7 +24,7 @@ export class UpdateTaskDto {
 
 	priority?: string
 
-	deadline: Date
+	deadline: string
 
 	isCompleted?: boolean
 }
